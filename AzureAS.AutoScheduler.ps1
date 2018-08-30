@@ -1,32 +1,32 @@
 ﻿param(     
-    [string] $resourceGroupName = "SSASAzureTest",
-    [string] $serverName = "rrdvsssassales",
+    [string] $resourceGroupName = "BITabularModel",
+    [string] $serverName = "guardiantabular",
     [string] $azureProfilePath  = "",
-    [string] $azureRunAsConnectionName = "",
-    [string] $configStr = "
+    [string] $azureRunAsConnectionName = "AzureRunAsConnection",
+    [string] $configStr = '
 [
     {
 	    WeekDays:[1,2,3,4,5]	
-	    ,StartTime: ""08:00:00""
-	    ,StopTime: ""17:59:59""
-	    ,Sku: ""S1""
+	    ,StartTime: "06:00:00"
+	    ,StopTime: "18:59:59"
+	    ,Sku: "S1"
 	}
     ,
     {
 	    WeekDays:[1,2,3,4,5]	
-	    ,StartTime: ""18:00:00""
-	    ,StopTime: ""23:59:59""
-	    ,Sku: ""S0""
+	    ,StartTime: "19:00:00"
+	    ,StopTime: "23:59:59"
+	    ,Sku: "S0"
 	}
     ,
     {
 	    WeekDays:[6, 0]	
-	    ,StartTime: ""08:00:00""
-	    ,StopTime: ""23:59:59""
-	    ,Sku: ""S0""
+	    ,StartTime: "00:00:00"
+	    ,StopTime: "23:59:59"
+	    ,Sku: "S0"
 	}    
 ]
-"
+'
 )
 
 $VerbosePreference = "Continue"
@@ -57,7 +57,12 @@ else
 
 $stateConfig = $configStr | ConvertFrom-Json
 
-$startTime = Get-Date
+$inputStartTime = Get-Date
+
+$fromTimeZone = "UTC" # Default timezone for Powershell runbooks
+$toTimeZone = "Eastern Standard Time"
+
+$startTime = [System.TimeZoneInfo]::ConvertTimeBySystemTimeZoneId($inputStartTime.DateTime, $fromTimeZone, $toTimeZone)
 
 $currentDayOfWeek = [Int]($startTime).DayOfWeek
 
